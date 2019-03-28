@@ -1,0 +1,117 @@
+{include file="common/head"/}
+<fieldset class="layui-elem-field layui-field-title">
+    <legend>{$title}</legend>
+</fieldset>
+<form class="layui-form" action="" style="margin-top: 20px;" lay-filter="form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">名称</label>
+        <div class="layui-input-inline">
+            <input type="text" name="name" required  lay-verify="required" placeholder="请输入名称" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">链接地址</label>
+        <div class="layui-input-inline">
+            <input type="text" name="link_url" required lay-verify="required" placeholder="请输入链接" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-form-mid layui-word-aux">辅助文字</div>
+    </div>
+    <!--如果是编辑过来，则不显示排序，新窗口，状态-->
+    {if(!isset($edit))}
+    <div class="layui-form-item">
+        <label class="layui-form-label">排序</label>
+        <div class="layui-input-inline">
+            <input type="text" name="sort" required lay-verify="required" placeholder="请输入链接" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-form-mid layui-word-aux">辅助文字</div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">是否新窗口</label>
+        <div class="layui-input-block">
+            <input type="radio" name="target" value="1" title="是" checked>
+            <input type="radio" name="target" value="0" title="否">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">是否显示</label>
+        <div class="layui-input-block">
+            <input type="radio" name="status" value="1" title="是" checked>
+            <input type="radio" name="status" value="0" title="否">
+        </div>
+    </div>
+    {/if}
+    <div class="layui-form-item">
+        <label class="layui-form-label">链接Logo</label>
+        <input type="hidden" name="link_logo" id="pic" value="">
+        <div class="layui-input-block">
+            <div class="layui-upload">
+                <button type="button" class="layui-btn layui-btn-primary" id="adBtn"><i class="icon icon-upload3"></i>点击上传</button>
+                <div class="layui-upload-list">
+                    <img class="layui-upload-img" id="adPic">
+                    <p id="demoText"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+            <a href="{:url('friend')}" class="layui-btn layui-btn-primary">返回</a>
+        </div>
+    </div>
+</form>
+{include file="common/foot"/}
+<script>
+    //Demo
+    layui.use(['form','upload'], function(){
+        var form = layui.form,upload = layui.upload,$ = layui.jquery;
+        //初始化form
+        var info = {$info|raw};
+        // console.log(info);
+        form.val("form",info);
+        if(info){
+            $('#adPic').attr('src',info.link_logo);
+        }
+        form.render();
+        //图片上传
+        var uploadInst = upload.render({
+            elem:'#adBtn',
+            url:'{:url("UpFiles/upload")}',
+            before:function(obj){   //上传前回调，预览图片
+                obj.preview(function(index, file, result){
+                    $('#adPic').attr('src', result); //图片链接（base64）
+                });
+            },
+            done:function(res){
+                if (res.code==1){
+                    $('#pic').val(res.url);
+                    layer.msg(res.info);
+                }else {
+                    layer.msg(res.info);
+                }
+            }
+        });
+        //监听提交
+        form.on('submit(formDemo)', function(data){
+            var loading = layer.load(1, {shade: [0.1, '#fff']});
+            $.ajax({
+                url:'',   // 默认提交本身
+                data:data.field,
+                type:'post',
+                success:function (res) {
+                    layer.close(loading);
+                    if (res.code==1){
+                        layer.msg(res.msg,{time:1000,icon:1},function () {
+                            location.href = res.url
+                        });
+                    }else {
+                        layer.msg(res.msg,{time:1000,icon:2})
+                    }
+                }
+            });
+            return false;
+        });
+    });
+</script>
+</body>
+</html>

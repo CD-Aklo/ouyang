@@ -1,0 +1,105 @@
+{include file="common/head"/}
+<fieldset class="layui-elem-field layui-field-title">
+    <legend>{$title}</legend>
+</fieldset>
+<form class="layui-form" action="" style="margin-top: 20px;" lay-filter="form">
+    <div class="layui-form-item">
+        <label class="layui-form-label">会员类型</label>
+        <div class="layui-input-inline">
+            <select name="identity_type" lay-verify="required">
+                <option value="">选择身份</option>
+                {foreach $type as $k=>$v}
+                <option value="{$v.id}">{$v.name}</option>
+                {/foreach}
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">结算周期</label>
+        <div class="layui-input-inline">
+            <select name="period" lay-verify="required">
+                <option value="">选择周期</option>
+                {foreach $period as $k=>$v}
+                <option value="{$v.id}">{$v.period_attr}</option>
+                {/foreach}
+            </select>
+        </div>
+        <!--<div class="layui-form-mid layui-word-aux">辅助文字</div>-->
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">会员电话</label>
+        <div class="layui-input-inline">
+            <input type="text" name="mobile"  lay-verify="required|phone" class="layui-input" autocomplete="off">
+        </div>
+        <div class="layui-form-mid layui-word-aux"><span style="color: red">会员商城注册号码</span></div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">授信额度</label>
+        <div class="layui-input-inline">
+            <input type="text" name="credit_amount"  lay-verify="required" class="layui-input" autocomplete="off">
+        </div>
+        <div class="layui-form-mid layui-word-aux"><span style="color: red">单笔最大金额</span></div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">开始时间</label>
+        <div class="layui-input-inline">
+            <input type="text" name="start_time" class="layui-input" id="start" autocomplete="off" lay-verify="required">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">结束时间</label>
+        <div class="layui-input-inline">
+            <input type="text" name="end_time" class="layui-input" id="end" autocomplete="off" lay-verify="required">
+        </div>
+    </div>
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">备注</label>
+        <div class="layui-input-inline" style="width: 300px;">
+            <textarea name="desc" placeholder="请输入内容" class="layui-textarea"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+            <a href="{:url('userIdentity')}" class="layui-btn layui-btn-primary">返回</a>
+        </div>
+    </div>
+</form>
+{include file="common/foot"/}
+<script>
+    //Demo
+    layui.use(['form','laydate'], function(){
+        var form = layui.form,laydate = layui.laydate,$ = layui.jquery;
+        var info = {$uData|raw};
+        form.val('form',info);
+        //时间
+        laydate.render({
+            elem: '#start', //指定元素
+            type:'datetime'
+        });
+        laydate.render({
+            elem: '#end',
+            type:'datetime'
+        });
+        //监听提交
+        form.on('submit(formDemo)', function(data){
+            // 提交到方法 默认为本身
+            var loading = layer.load(1, {shade: [0.1, '#fff']});
+            $.post("", data.field, function (res) {
+                layer.close(loading);
+                if (res.code > 0) {
+                    layer.msg(res.msg, {time: 1800, icon: 1}, function () {
+                        // alert(123);
+                        location.href = res.url;
+                    });
+                } else {
+                    layer.msg(res.msg, {time: 1800, icon: 2});
+                }
+            });
+            return false;
+        });
+    });
+</script>
+
+</body>
+</html>

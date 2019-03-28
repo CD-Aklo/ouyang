@@ -1,0 +1,72 @@
+{include file="common/head"/}
+<div class="admin-main layui-anim layui-anim-upbit">
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend>修改密码</legend>
+    </fieldset>
+    <form class="layui-form layui-form-pane" lay-filter="form">
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户名</label>
+            <div class="layui-input-4">
+                <input type="text" name="username" lay-verify="required" readonly="readonly" placeholder="{:lang('pleaseEnter')}用户名" class="layui-input">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">旧密码</label>
+            <div class="layui-input-4">
+                <input type="password" name="oldpwd" placeholder="请输入旧密码" lay-verify="required" class="layui-input">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">新密码</label>
+            <div class="layui-input-4">
+                <input type="password" name="newpwd" placeholder="请输入新密码" lay-verify="required" class="layui-input">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">确认密码</label>
+            <div class="layui-input-4">
+                <input type="password" name="renewpwd" placeholder="请确认新密码" lay-verify="required" class="layui-input">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                
+            </div>
+        </div>
+        
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <input type="hidden" name="admin_id">
+                <button type="button" class="layui-btn" lay-submit="" lay-filter="submit">提交</button>
+                <a href="{:url('main')}" class="layui-btn layui-btn-primary">返回</a>
+            </div>
+        </div>
+    </form>
+</div>
+{include file="common/foot"/}
+<script>
+    layui.use(['form', 'layer','upload'], function () {
+        var form = layui.form, layer = layui.layer,$= layui.jquery;
+        var info = {$info|raw};
+        form.val("form", info);
+        form.render();
+        form.on('submit(submit)', function (data) {
+            loading =layer.load(1, {shade: [0.1,'#fff']});
+            $.post("", data.field, function (res) {
+                layer.close(loading);
+                if (res.code > 0) {
+                    layer.msg(res.msg, {time: 1800, icon: 1});
+                } else {
+                    layer.msg(res.msg, {time: 1800, icon: 2});
+                }
+            });
+        });
+    });
+</script>

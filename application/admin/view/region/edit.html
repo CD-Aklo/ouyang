@@ -1,0 +1,65 @@
+{include file="common/head"/}
+<form class="layui-form" action="" style="margin-top: 10px;">
+    <div class="layui-form-item">
+        <input type="hidden" name="id" value="{$res.id}">
+        <label class="layui-form-label">名称</label>
+        <div class="layui-input-inline">
+            <input type="text" name="name"   lay-verify="required" value="{$res.name}"  autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">到镇距离</label>
+        <div class="layui-input-inline">
+            <input type="text" name="distance"  lay-verify="required|number" value="{$res.distance}" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-form-mid layui-word-aux">填写数字不带单位</div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">起送标准</label>
+        <div class="layui-input-inline">
+            <input type="text" name="delivery"  lay-verify="required" value="{$res.Delivery}" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-form-mid layui-word-aux">具体金额不带单位</div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">运费</label>
+        <div class="layui-input-inline">
+            <input type="text" name="freight"  lay-verify="required"  value="{$res.freight}" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">免运费标准</label>
+        <div class="layui-input-inline">
+            <input type="text" name="freight_free"  lay-verify="required" value="{$res.freight_free}" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-form-mid layui-word-aux"></div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+        </div>
+    </div>
+</form>
+{include file="common/foot"/}
+<script>
+    //Demo
+    layui.use('form', function(){
+        var form = layui.form,$ = layui.jquery;
+        //监听提交
+        form.on('submit(formDemo)', function(data){
+            // console.log(data.field);
+            $.post('{:url("admin/region/edit")}',{data:data.field},function (res) {
+                if (res.code===1){
+                    layer.msg(res.msg,{time:2000,icon:1})
+                }else {
+                    layer.msg(res.msg,{time:2000,icon:2})
+                }
+                var index = parent.layer.getFrameIndex(window.name);
+                setTimeout(function () {
+                    parent.layer.close(index); //再执行关闭
+                },1500)
+            },'json')
+            return false;
+        });
+    });
+</script>

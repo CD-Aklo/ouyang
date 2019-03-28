@@ -1,0 +1,76 @@
+{include file="common/head"/}
+<div class="admin-main layui-anim layui-anim-upbit">
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend>会员身份列表</legend>
+    </fieldset>
+    <div class="demoTable">
+        <a href="{:url('identityAdd')}" class="layui-btn" style="float:left;"><i class="fa fa-plus" aria-hidden="true"></i>添加用户</a>
+        <div style="float: right">
+            <div class="layui-inline">
+                <input class="layui-input" name="phone" id="key" placeholder="请输入手机号">
+            </div>
+            <button class="layui-btn" id="search" data-type="reload">搜索</button>
+        </div>
+        <div style="clear: both;"></div>
+    </div>
+    <table class="layui-table" id="list" lay-filter="list"></table>
+</div>
+<script type="text/html" id="action">
+    <a href="{:url('identityEdit')}?ui_id={{d.ui_id}}" class="layui-btn layui-btn-xs">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+{include file="common/foot"/}
+<script>
+    layui.use(['table','form'], function() {
+        var table = layui.table,form = layui.form, $ = layui.jquery;
+        var tableIn = table.render({
+            id: 'user',
+            elem: '#list',
+            url: '{:url("userIdentity")}',
+            method: 'post',
+            page: true,
+            cols: [[
+                {field: 'ui_id', title: 'ID',align: 'center', width: 60, fixed: true, sort: true},
+                {field: 'mobile', align: 'center',title: '手机号码', width: 120,templet:'#email'},
+                {field: 'identity_type', title: '身份类型', width: 90},
+                {field: 'period_attr',align: 'center',title: '结算周期', width: 120},
+                {field: 'period_charge_ratio', align: 'center',title: '结算比率', width: 90},
+                {field: 'credit_amount', align: 'center',title: '授信额度', width: 120},
+                {field: 'start_time',align: 'center', title: '开始时间', width: 150},
+                {field: 'end_time',align: 'center', title: '结束时间', width: 150},
+                {field: 'add_time',align: 'center', title: '添加时间', width: 150},
+                {width: 160, align: 'center', toolbar: '#action'}
+            ]],
+            limit: 10 //每页默认显示的数量
+        });
+        //搜索
+        $('#search').on('click', function() {
+            var phone = $('#key').val();
+            if($.trim(phone)==='') {
+                layer.msg('请输入手机号！',{icon:0});
+                return;
+            }
+            tableIn.reload({ page: {page: 1},where: {phone: phone}});
+        });
+        table.on('tool(list)', function(obj) {
+            var data = obj.data;
+            if (obj.event === 'del') {
+                layer.confirm('您确定要删除该会员吗？', function(index){
+                    var loading = layer.load(1, {shade: [0.1, '#fff']});
+                    $.post("{:url('identityDel')}",{ui_id:data.ui_id},function(res){
+                        layer.close(loading);
+                        if(res.code===1){
+                            layer.msg(res.msg,{time:1000,icon:1});
+                            tableIn.reload();
+                        }else{
+                            layer.msg('操作失败！',{time:1000,icon:2});
+                        }
+                    });
+                    layer.close(index);
+                });
+            }
+        });
+    });
+</script>
+</body>
+</html>

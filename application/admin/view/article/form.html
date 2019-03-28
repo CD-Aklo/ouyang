@@ -1,0 +1,148 @@
+{include file="common/head"/}
+<div class="admin-main layui-anim layui-anim-upbit">
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend>{$title}</legend>
+    </fieldset>
+    <form class="layui-form layui-form-pane" lay-filter="form">
+        <div class="layui-form-item">
+            <label class="layui-form-label">文章标题</label>
+            <div class="layui-input-4">
+                <input type="text" name="title"  lay-verify="required" placeholder="请输入文章标题" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">文章分类</label>
+            <div class="layui-input-4">
+                <select name="art_type" lay-verify="required">
+                    <option value="">请选择文章类型</option>
+                    {volist name="$type" id="vo"}
+                    <option value="{$vo.id}">{$vo.type}</option>
+                    {/volist}
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">添加URL</label>
+            <div class="layui-input-4">
+                <input type="text" name="link"  lay-verify="url" placeholder="文章链接" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">浏览量</label>
+            <div class="layui-input-4">
+                <input type="text" name="view_num"  lay-verify="required|number" placeholder="浏览初始值，请设定整数" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">关键字</label>
+            <div class="layui-input-4">
+                <input type="text" name="keywords"  placeholder="关键字,方便seo优化" class="layui-input">
+            </div>
+        </div>
+        <!--如果是编辑的话不显示状态-->
+        {if($info=='null')}
+        <div class="layui-form-item">
+            <label class="layui-form-label">是否显示</label>
+            <div class="layui-input-block">
+                <input type="radio" name="status" value="1" title="开启" checked>
+                <input type="radio" name="status" value="0"  title="关闭">
+            </div>
+        </div>
+        {/if}
+        <div class="layui-form-item">
+            <label class="layui-form-label">排序</label>
+            <div class="layui-input-4">
+                <input type="text" name="sort" lay-verify="number"  placeholder="从小到大排序" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">简述</label>
+            <div class="layui-input-4">
+                <textarea name="desc"   class="layui-textarea" placeholder="请输入文章简介"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">详情内容</label>
+            <div class="layui-input-4">
+                <textarea id="myEditor" name="content"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button type="button" class="layui-btn" lay-submit="" lay-filter="submit">提交</button>
+                <a href="{:url('index')}" class="layui-btn layui-btn-primary">返回</a>
+            </div>
+        </div>
+    </form>
+</div>
+{include file="common/foot"/}
+<script type="text/javascript" src="__ADMIN__ueditor/ueditor.config.js"></script>
+<script type="text/javascript" src="__ADMIN__ueditor/ueditor.all.js"></script>
+<script>
+    layui.use(['form', 'layer','upload','laydate'], function () {
+        var form = layui.form, $ = layui.jquery, upload = layui.upload,laydate = layui.laydate;
+        var info = {$info|raw};
+        // console.log(info);
+        form.val("form",info);
+        form.render();
+        form.on('submit(submit)', function (data) {
+            // 提交到方法 默认为本身
+            var loading = layer.load(2, {shade: [0.1, '#fff']});
+            $.post("", data.field, function (res) {
+                // console.log(data.field);
+                // return false;
+                layer.close(loading);
+                if (res.code > 0) {
+                    layer.msg(res.msg, {time: 1800, icon: 1}, function () {
+                        location.href = res.url;
+                    });
+                } else {
+                    layer.msg(res.msg, {time: 1800, icon: 2});
+                }
+            });
+        });
+        //时间组件
+        laydate.render({
+            elem: '#start'
+            ,type: 'datetime'
+        });
+        laydate.render({
+            elem: '#end'
+            ,type: 'datetime'
+        });
+        //普通图片上传
+        var uploadInst = upload.render({
+            elem: '#adBtn'
+            ,url: '{:url("UpFiles/upload")}'
+            ,before: function(obj){
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+                    $('#adPic').attr('src', result); //图片链接（base64）
+                });
+            },
+            done: function(res){
+                if(res.code>0){
+                    $('#pic').val(res.url);
+                }else{
+                    //如果上传失败
+                    return layer.msg('上传失败');
+                }
+            }
+            ,error: function(){
+                //演示失败状态，并实现重传
+                var demoText = $('#demoText');
+                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-mini demo-reload">重试</a>');
+                demoText.find('.demo-reload').on('click', function(){
+                    uploadInst.upload();
+                });
+            }
+        });
+        //实例化 ueditor
+        var ue = UE.getEditor('myEditor',{
+            // initialFrameWidth :800,//设置编辑器宽度
+            initialFrameHeight:250,
+            // autoHeightEnabled: true,
+            // autoFloatEnabled: true
+        });
+    });
+</script>

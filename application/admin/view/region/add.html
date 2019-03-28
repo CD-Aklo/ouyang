@@ -1,0 +1,130 @@
+{include file="common/head"/}
+<form class="layui-form" action="{:url('add')}" method="post" style="margin-top: 20px;">
+    <div class="layui-form-item" id="con">
+        <label class="layui-form-label">选择地区</label>
+        <div class="layui-inline">
+            <select name="province" lay-verify="required" id="province">
+                <option value="">选择省份</option>
+                {foreach $province as $k=>$v}
+                <option value="{$v.id}">{$v.name}</option>
+                {/foreach}
+            </select>
+        </div>
+
+        <div class="layui-inline" id="city">
+            <select name="city"  id="citys">
+
+            </select>
+        </div>
+
+        <div class="layui-inline" id="area">
+            <select name="area"  id="areas">
+
+            </select>
+        </div>
+
+        <div class="layui-inline" id="town">
+            <select name="town"  id="towns">
+
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">级别</label>
+        <div class="layui-input-block">
+            <input type="radio" name="level" value="1" title="同级">
+            <input type="radio" name="level" value="0" title="下级" checked>
+        </div>
+        <div class="layui-form-mid layui-word-aux">新增城市与选择城市的关系</div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">城市名称</label>
+        <div class="layui-input-inline">
+            <input type="text" name="name" required  lay-verify="required" placeholder="请输入标题" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">县镇距离</label>
+        <div class="layui-input-inline">
+            <input type="text" name="distance" placeholder="没有则不填" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">起送标准</label>
+        <div class="layui-input-inline">
+            <input type="text" name="delivery" placeholder="没有则不填" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">运费</label>
+        <div class="layui-input-inline">
+            <input type="text" name="freight" placeholder="没有则不填" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">免运费标准</label>
+        <div class="layui-input-inline">
+            <input type="text" name="freight_free" placeholder="没有则不填" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+            <a href="{:url('index')}" class="layui-btn layui-btn-primary">返回</a>
+        </div>
+    </div>
+</form>
+{include file="common/foot"/}
+<script>
+    //Demo
+    layui.use('form', function(){
+        var form = layui.form ,$ = layui.jquery;
+        //监听下拉框
+        form.on('select()',function (data) {
+            var choose = data.elem.getAttribute("id");
+            // if (choose=='areas') return false
+           $.ajax({
+               url:"{:url('admin/region/ajaxGetRegion')}",
+               type:'post',
+               data:{id:data.value},
+               success:function (res) {
+                    if (res.code=='0'){
+                        var str = '<option value=""></option>';
+                        for (var i = 0; i<res.data.length;i++){
+                            str += '<option value='+res.data[i].id+'>'+res.data[i].name+'</option>'
+                        }
+                        if (choose=='province'){
+                            $("#citys").html('');
+                            $("#citys").append(str);
+                            form.render();
+                        }else if (choose=='citys'){
+                            $("#areas").html('');
+                            $("#areas").append(str);
+                            form.render();
+                        } else if (choose=='areas'){
+                            $("#towns").html('');
+                            $("#towns").append(str);
+                            form.render();
+                        }
+                    }else {
+                        layer.msg(res.msg,{time:1000,icon:2})
+                    }
+               },
+               error:function () {
+                   layer.msg('请求通信异常',{time:1000,icon:1})
+               }
+           })
+        });
+        //监听提交
+        form.on('submit(formDemo)', function(data){
+
+        });
+    });
+</script>
+
+</body>
+</html>

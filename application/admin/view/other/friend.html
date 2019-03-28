@@ -1,0 +1,128 @@
+{include file="common/head"/}
+<div class="admin-main layui-anim layui-anim-upbit">
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend>友情链接列表</legend>
+    </fieldset>
+    <div class="demoTable">
+        <a href="{:url('friendAdd')}" class="layui-btn" style="float:left;"><i class="fa fa-plus" aria-hidden="true"></i>添加友情链接</a>
+        <div style="float: right">
+            <div class="layui-inline">
+                <input class="layui-input" name="key" id="key" placeholder="请输入链接名称">
+            </div>
+            <button class="layui-btn" id="search" data-type="reload">搜索</button>
+        </div>
+        <div style="clear: both;"></div>
+    </div>
+    <table class="layui-table" id="list" lay-filter="list"></table>
+</div>
+<script type="text/html" id="order">
+    <input name="sort" type="text" data-id="{{d.fl_id}}" class="list_order layui-input" value=" {{d.sort}}" size="10"/>
+</script>
+<script type="text/html" id="link_logo">
+    <img src="{{d.link_logo}}" style="width: 100%;height: 100%" onmouseover="layer.tips('<img src={{d.link_logo}}>',this,{tips: [1, '#fff']});" onmouseout="layer.closeAll()"; >
+</script>
+<script type="text/html" id="target">
+    <input type="checkbox" name="target" lay-skin="switch" value="{{d.fl_id}}" lay-text="是|否" lay-filter="target" {{ d.target == 1 ? 'checked' : '' }}>
+</script>
+<script type="text/html" id="status">
+    <input type="checkbox" name="status" lay-skin="switch" value="{{d.fl_id}}" lay-text="是|否" lay-filter="status" {{d.status ==1 ? 'checked' : ''}}>
+</script>
+<script type="text/html" id="action">
+    <a href="{:url('friendEdit')}?fl_id={{d.fl_id}}" class="layui-btn layui-btn-xs">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+</script>
+{include file="common/foot"/}
+<script>
+    layui.use(['table','form'], function() {
+        var table = layui.table,form = layui.form,$ = layui.jquery;
+        var tableIn = table.render({
+            id: 'user',
+            elem: '#list',
+            url: '{:url("friend")}',
+            method: 'post',
+            page: true,
+            limit: 10, //每页默认显示的数量
+            cols: [[
+                {field: 'fl_id', align: 'center',title: 'ID', width:80 , fixed: true, sort: true},
+                {field: 'name', align: 'center',title: '链接名称', width: 120,},
+                {field: 'link_loge', align: 'center',title: '链接logo', width: 120,templet:'#link_logo'},
+                {field: 'link_url', align: 'center',title: '链接地址', width: 150},
+                {field: 'sort', align: 'center',title: '排序', width: 80,templet:'#order'},
+                {field: 'target', align: 'center',title: '新标签', width: 150,templet:'#target'},
+                {field: 'status', align: 'center',title: '是否显示', width: 150,templet:'#status'},
+                {field: 'add_time', align: 'center',title: '添加时间', width: 150},
+                {width: 160, align: 'center', toolbar: '#action'}
+            ]],
+        });
+        //监听开关
+        form.on('switch()',function (obj) {
+            var fl_id = this.value;
+            var field = obj.elem.getAttribute('lay-filter');
+            var value = obj.elem.checked===true?1:0;
+            var loading = layer.load(2,{shade:[0.1,'#fff']});
+            $.ajax({
+                url:'{:url("friendStatus")}',
+                data:{fl_id:fl_id,field:field,value:value},
+                type:'post',
+                success:function (res) {
+                    layer.close(loading);
+                    if (res==1){
+                        layer.msg(res.msg,{time:1000,icon:2})
+                    }else {
+                        layer.msg(res.msg,{time:1000,icon:1})
+                    }
+                }
+            });
+        });
+        //搜索
+        $('#search').on('click', function() {
+            var key = $('#key').val();
+            if($.trim(key)==='') {
+                layer.msg('请输入关键字！',{icon:0});
+                return;
+            }
+            tableIn.reload({ page: {page: 1},where: {name: key}});
+        });
+        //排序
+        $('body').on('blur','.list_order',function () {
+            var fl_id = $(this).attr('data-id');
+            var sort = $(this).val();
+            var loading = layer.load(2,{shade:[0.1,'#fff']});
+            $.ajax({
+               url:'{:url("friendSort")}',
+               data:{'fl_id':fl_id,'sort':sort},
+               type:'post',
+               success:function (res) {
+                   layer.close(loading);
+                   if (res.code==1){
+                       layer.msg(res.msg,{time:1000,icon:1});
+                       tableIn.reload();
+                   }else {
+                       layer.msg('排序失败',{time:1000,icon:2})
+                   }
+               }
+            });
+            return false;
+        })
+        table.on('tool(list)', function(obj) {
+            var data = obj.data;
+            if (obj.event === 'del') {
+                layer.confirm('您确定要删除该链接吗？', function(index){
+                    var loading = layer.load(2, {shade: [0.1, '#fff']});
+                    $.post("{:url('friendDel')}",{fl_id:data.fl_id},function(res){
+                        layer.close(loading);
+                        if(res.code===1){
+                            layer.msg(res.msg,{time:1000,icon:1});
+                            tableIn.reload();
+                        }else{
+                            layer.msg('操作失败！',{time:1000,icon:2});
+                        }
+                    });
+                    layer.close(index);
+                });
+            }
+        });
+    });
+</script>
+</body>
+</html>

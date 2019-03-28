@@ -1,0 +1,318 @@
+{include file="public/header" /}
+
+<script type="text/javascript">
+jQs(document).ready(function(){
+	//jQs('#formss').FormInputjQ();
+	autoinput();
+	showHistory();//获取search历史
+	autosearch();//搜索输入内容显隐
+	oksearchwords();//绑定搜索回车
+	lazying();//图片惰性加载
+});
+window.onload = function(){
+	//TopShowWai();//显示头部固定悬浮导航
+}
+</script>
+<div class="searchers">
+<div class="searcher module hide" id="searcher">
+  <div class="main">
+    <a class="close pointer" href="javascript:;" onclick="outSearch()"><i class="iconfont">&#xe6e9;</i></a>
+    <div class="scin cut">
+      <a class="fr" onclick="searchGoods()"><i class="iconfont">&#xe632;</i></a>
+      <div class="in cut"><input id="kwenter" name="kw" type="text" class="variseclear" value="" required /><i class="vinclrbtn iconfont">&#xe6e9;</i></div>
+    </div>
+  </div>
+  <dl class="hot">
+    <dt>热搜：</dt>
+    <dd>
+       <a href="/search/index.html?kw=iPhone 7">iPhone 7</a>
+       <a href="/search/index.html?kw=Nova">Nova</a>
+       <a href="/search/index.html?kw=Surface">Surface</a>
+    </dd>
+  </dl>
+</div>
+</div>
+<script type="text/template" id="history-tpl">
+	<dl class="history" id="history">
+	  <dt>历史：</dt>
+	  <dd>
+	    {@each list as v}
+	    <a href="/search/index.html?kw=${v}">${v}</a>
+	    {@/each}
+	    <a class="clear" onclick="clearHistory()">清除历史记录</a>
+	  </dd>
+	</dl>
+</script>
+
+<div class="top1" id="wrapper">
+    <div class="m640 f14 yahei">
+        <div class="toptxt">
+            <p>购物车</p>
+            <div class="topdao"><i class="iconfont f22" onclick='javascript:history.back(-1)'>&#xe625;</i></div>
+            <div class="topsearch">
+                <div class="toplist">
+                    <div class="topsear">
+                        <a class="pointer" href="javascript:;" onclick="inSearch()"><i class="iconfont f22">&#xe632;</i></a>
+                    </div>
+                    <div class="topmsg" onclick="javascript:toprdaobody()"><i class="iconfont f22">&#xe665;</i></div>
+                    <div class="b" onclick="javascript:toprdaobody()"><i class="iconfont f14">&#xe830;</i></div>
+                    <div class="share" onclick="javascript:topshare()"><i class="iconfont f18">&#xe624;</i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--导航右上角消息弹出内容 begin-->
+<div class="hide">
+    <div class="toprdaobody">
+        <div class="rights">▲</div>
+        <div class="rightx">
+            <ul>
+                <li><i class="iconfont f14">&#xec36;</i><span class="title"><a href="javascript:;">消息</a></span><span class="hong yahei">+356678678</span></li>
+                <li><i class="iconfont f14">&#xe63f;</i><span class="title"><a href="javascript:;">购物</a></span><span class="hong yahei">+3</span></li>
+                <li><i class="iconfont f14">&#xe62e;</i><span class="title"><a href="javascript:;">首页</a></span></li>
+                <li><i class="iconfont f14">&#xec81;</i><span class="title" onclick='javascript:fenleibodyall()'>分类</span></li>
+                <li><i class="iconfont f14">&#xe62f;</i><span class="title"><a href="javascript:;">我的</a></span></li>
+                <li><i class="iconfont f14">&#xe627;</i><span class="title"><a href="javascript:kefujingli();">客服</a></span></li>
+            </ul>
+        </div>
+    </div>
+</div>
+<!--导航右上角消息弹出内容 end-->
+<!--分享弹出开始-->
+<div class="hide">
+    <div class="topshare">
+        分享链接到微信朋友圈/微博等，每当有用户点击可获得0.01-0.1元红包奖励
+        <div class="hide" id="shareurlhide">这里读取分享的内容（文字链接）http://www.baidu.com/</div>
+        <div class="sharebottom" onClick="javascript:topshareurl();">复制链接</div>
+    </div>
+</div>
+<!--分享弹出结束-->
+<div class="hide">
+    <div class="fenleibodyall">
+        <div class="close"><i class="iconfont f24 jzlanse" onclick="layer.closeAll();">&#xeba1;</i></div>
+        <div class="body">
+            <div class="left">
+                <ul>
+                    <li class="fenleilist fenleilist0" onClick="javascript:fenleishowhide(0)">产品分类</li>
+                    <li class="fenleilist fenleilist1" onClick="javascript:fenleishowhide(1)">渠道分类</li>
+                    <li class="fenleilist fenleilist2" onClick="javascript:fenleishowhide(2)">食材库</li>
+                    <li class="fenleilist fenleilist3" onClick="javascript:fenleishowhide(3)">成品库</li>
+                    <li class="fenleilist fenleilist4" onClick="javascript:fenleishowhide(4)">品牌专区</li>
+                    <li class="fenleilist fenleilist5" onClick="javascript:fenleishowhide(5)">活动专区</li>
+                </ul>
+            </div>
+            <div class="right isrightoverflow-y">
+                <div class="banner">
+                    <!-- 首页banner广告 begin ================================ -->
+                    <div class="focusul_one">
+                        <ul id="focusul_one">
+                            <li><a href="#"><img class="lazy" src="/public/load/images/lazy.jpg" lazy="/public/upload/1.jpg" alt="文字" /></a></li>
+                            <li><a href="#"><img class="lazy" src="/public/load/images/lazy.jpg" lazy="/public/upload/2.jpg" alt="文字"/></a></li>
+                            <li><a href="#"><img class="lazy" src="/public/load/images/lazy.jpg" lazy="/public/upload/3.jpg" alt="文字"/></a></li>
+                            <li><a href="#"><img class="lazy" src="/public/load/images/lazy.jpg" lazy="/public/upload/4.jpg" alt="文字"/></a></li>
+                        </ul>
+                        <div class="focusa_one"></div>
+                    </div>
+                    <!-- 首页banner广告 End ================================ -->
+                </div>
+                <div class="fenleiwords fenleiwords0">
+                    <div class="title title0">冷冻肉类</div>
+                    <ul>
+                        <li><a href="javascript:;">牛肉原料</a></li><li><a href="javascript:;">猪肉原料</a></li><li><a href="javascript:;">鸡肉原料</a></li><li><a href="javascript:;">羊肉原料</a></li><li><a href="javascript:;">鸡肉原料</a></li>
+                    </ul>
+                    <div class="title title1">冷冻海鲜类</div>
+                    <ul>
+                        <li><a href="javascript:;">冷的鱼类</a></li><li><a href="javascript:;">冷冻虾</a></li><li><a href="javascript:;">冷冻蟹</a></li><li><a href="javascript:;">冷冻贝类</a></li>
+                    </ul>
+                    <div class="title title2">简餐配餐</div>
+                    <ul>
+                        <li><a href="javascript:;">米饭类</a></li><li><a href="javascript:;">炒饭类</a></li><li><a href="javascript:;">粥类</a></li><li><a href="javascript:;">面类</a></li><li><a href="javascript:;">汤类</a></li>
+                    </ul>
+                    <br>werwer<br>werwer<br>wer80-90-90-wer<br>werwer<br>werwer<br>wer7867wer<br>werwer<br>werwer<br>wer33333333wer<br>werwer<br>werw0-=0-=er<br>werwer<br>werwer<br>werwer<br>wer55555555wer<br>wer333333333wer<br>werwer<br>we111111rwer
+                </div>
+                <div class="fenleiwords fenleiwords1">111111111</div>
+                <div class="fenleiwords fenleiwords2">22222222222</div>
+                <div class="fenleiwords fenleiwords3">3333333333</div>
+                <div class="fenleiwords fenleiwords4">4444444444444</div>
+                <div class="fenleiwords fenleiwords5">555555555555555555555555555</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--------------------------------整个头部 end---------------------------------------------->
+
+<ul class="daohaoul">
+    <li><a href="?id=1" class="hover">现货</a></li>
+    <li><a href="?id=2">预售</a></li>
+    <li><a href="?id=3">预定</a></li>
+    <li><a href="?id=4">生鲜</a></li>
+</ul>
+
+<!--购物车列表-->
+<ul class="cartul yahei">
+    <li class="li_506608 hover">
+        <div class="eject eject_506608">
+            <div class="ebody">
+                <div class="xebody">
+                    <a href="javascript:;" class="a1 jzlanse">精选</a>
+                    <a href="javascript:;" class="a2 jzlanse">同款</a>
+                    <a href="javascript:cartdelete(506608);" class="a3 jzlanse">删除</a>
+                    <a href="javascript:cartejecthide(506608);" class="a4 jzlanse">关闭</a>
+                </div>
+            </div>
+        </div>
+        <div class="left">
+            <!--因界面效果，隐藏input,使用i 切换-->
+            <input name="cart_select_506608" type="checkbox" class="hide" checked="checked" value="506608" autocomplete="off">
+            <i class="iconfont f18" onClick="javascript:cart_select(506608);"><span class="yes_506608">&#xebf3;</span><span class="no_506608 hide">&#xebf2;</span></i>
+        </div>
+        <div class="right jzlanse" onMousedown="javascript:cartejectshowpc(this,506608);" ontouchstart="javascript:cartejectshowmobile(this,506608);">
+            <div class="rightbody">
+                <div class="xleft"><a href="javascript:;"><img class="lazy" src="/static/home/images/lazy.jpg" lazy="/upload/11.jpg" alt="文字" /></a></div>
+                <div class="xright">
+                    <div class="t cart_title_506608">150g超值牛排（松洋）</div>
+                    <div class="t hong shuziti"><i class="iconfont f14">&#xeb1e;</i><span class="cart_price_506608">300.13</span>/件<span class="caolv">（比加入时降11.8元）</span></div>
+                    <div class="xxleft">
+                        <p class="coupon1">券</p>
+                        <p class="coupon2">券</p>
+                        <p class="activity">抢</p>
+                        <p class="activity">团</p>
+                        <p class="sample">样</p>
+                        <p class="sample">达州仓<span class="hide cart_sku_506608">（售罄）</span></p>
+                        <input type="text" class="hide" value="112.0000" name="cart_sku_506608">
+                    </div>
+                    <div class="xxright">
+                        <span class="caculate jzlanse" onclick="javascript:caculate_number( 1, 506608, 112.0000);">+</span>
+                        <input type="text" readonly value="1" name="cart_number_506608" class="cart_number_506608" onClick="cartinputnumber(506608, 112.0000)" autocomplete="off">
+                        <span class="caculate jzlanse" onclick="javascript:caculate_number( 0, 506608, 112.0000);">-</span>
+                    </div>
+                </div>
+            </div>
+            <div class="des">
+                <a href="javascript:;">精选&nbsp;&nbsp;更省油耐用不起泡 [ 去看看 ]</a>
+                <p>抢购&nbsp;&nbsp;3月1日 - 3月20日, 原价<i class="iconfont f14">&#xeb1e;</i><span class="hui">420</span>, 单次限购10件</p>
+            </div>
+        </div>
+    </li>
+    
+    <li class="li_50">
+        <div class="eject eject_50">
+            <div class="ebody">
+                <div class="xebody">
+                    <a href="javascript:;" class="a1 jzlanse">精选</a>
+                    <a href="javascript:cartdelete(50);" class="a3 jzlanse">删除</a>
+                    <a href="javascript:cartejecthide(50);" class="a4 jzlanse">关闭</a>
+                </div>
+            </div>
+        </div>
+        <div class="left">
+            <!--因界面效果，隐藏input,使用i 切换-->
+            <input name="integral_select_50" type="checkbox" class="hide" value="50" autocomplete="off">
+            <i class="iconfont f18" onClick="javascript:cart_select(50);"><span class="yes_50 hide">&#xebf3;</span><span class="no_50">&#xebf2;</span></i>
+        </div>
+        <div class="right jzlanse" onMousedown="javascript:cartejectshowpc(this,50);" ontouchstart="javascript:cartejectshowmobile(this,50);">
+            <div class="rightbody">
+                <div class="xleft"><a href="javascript:;"><img class="lazy" src="/static/home/images/lazy.jpg" lazy="/upload/15.jpg" alt="文字" /></a></div>
+                <div class="xright">
+                    <div class="t cart_title_50">火腿肠</div>
+                    <div class="t hong shuziti">积分:<span class="cart_price_50">100</span>/份<span class="caolv"></span></div>
+                    <div class="xxleft">
+                        <p class="sample">样</p>
+                        <p class="sample">成都仓<span class="hide cart_sku_50">（已抢光）</span></p>
+                        <input type="text" class="hide" value="1" name="cart_sku_50">
+                    </div>
+                    <div class="xxright">
+                        <span class="caculate jzlanse" onclick="javascript:caculate_number( 1, 50, 1.0000);">+</span>
+                        <input type="text" readonly value="1" name="cart_number_50" class="cart_number_50" onClick="cartinputnumber(50, 1.0000)" autocomplete="off">
+                        <span class="caculate jzlanse" onclick="javascript:caculate_number( 0, 50, 1.0000);">-</span>
+                    </div>
+                </div>
+            </div>
+            <div class="des">
+                <p>样品&nbsp;&nbsp;仅可使用积分兑换，同一个产品单子只允许兑换1份</p>
+            </div>
+        </div>
+    </li>
+    
+    <li class="li_506">
+        <div class="eject eject_506">
+            <div class="ebody">
+                <div class="xebody">
+                    <a href="javascript:;" class="a2 jzlanse">同款</a>
+                    <a href="javascript:cartdelete(506);" class="a3 jzlanse">删除</a>
+                    <a href="javascript:cartejecthide(506);" class="a4 jzlanse">关闭</a>
+                </div>
+            </div>
+        </div>
+        <div class="left">
+            <!--因界面效果，隐藏input,使用i 切换-->
+            <input name="cart_select_506" type="checkbox" class="hide" value="506" autocomplete="off">
+            <i class="iconfont f18" onClick="javascript:cart_select(506);"><span class="yes_506 hide">&#xebf3;</span><span class="no_506">&#xebf2;</span></i>
+        </div>
+        <div class="right jzlanse" onMousedown="javascript:cartejectshowpc(this,506);" ontouchstart="javascript:cartejectshowmobile(this,506);">
+            <div class="rightbody">
+                <div class="xleft"><a href="javascript:;"><img class="lazy" src="/static/home/images/lazy.jpg" lazy="/upload/12.jpg" alt="文字" /></a></div>
+                <div class="xright">
+                    <div class="t cart_title_506">天宇70/80腿肉</div>
+                    <div class="t hong shuziti"><i class="iconfont f14">&#xeb1e;</i><span class="cart_price_506">60</span>/件<span class="caolv"></span></div>
+                    <div class="xxleft">
+                        <p class="sample">成都仓<span class="hide cart_sku_506">（售罄）</span></p>
+                        <input type="text" class="hide" value="11" name="cart_sku_506">
+                    </div>
+                    <div class="xxright">
+                        <span class="caculate jzlanse" onclick="javascript:caculate_number( 1, 506, 11);">+</span>
+                        <input type="text" readonly value="2" name="cart_number_506" class="cart_number_506" onClick="cartinputnumber(506, 11)" autocomplete="off">
+                        <span class="caculate jzlanse" onclick="javascript:caculate_number( 0, 506, 11);">-</span>
+                    </div>
+                </div>
+            </div>
+            <div class="des">
+                <p>团购&nbsp;&nbsp;3月1日 - 3月20日, 原价<i class="iconfont f14">&#xeb1e;</i><span class="hui">420</span>, 单次限购10件</p>
+            </div>
+        </div>
+    </li>
+    
+    <li class="li_6">
+        <div class="eject eject_6">
+            <div class="ebody">
+                <div class="xebody">
+                    <a href="javascript:;" class="a2 jzlanse">同款</a>
+                    <a href="javascript:cartdelete(6);" class="a3 jzlanse">删除</a>
+                    <a href="javascript:cartejecthide(6);" class="a4 jzlanse">关闭</a>
+                </div>
+            </div>
+        </div>
+        <div class="left">
+            <!--因界面效果，隐藏input,使用i 切换-->
+            <input name="cart_select_6" type="checkbox" class="hide" value="6" autocomplete="off">
+            <i class="iconfont f18" onClick="javascript:cart_select(6);"><span class="yes_6 hide">&#xebf3;</span><span class="no_6">&#xebf2;</span></i>
+        </div>
+        <div class="right jzlanse" onMousedown="javascript:cartejectshowpc(this,6);" ontouchstart="javascript:cartejectshowmobile(this,6);">
+            <div class="rightbody">
+                <div class="xleft"><a href="javascript:;"><img class="lazy" src="/static/home/images/lazy.jpg" lazy="/upload/18.jpg" alt="文字" /></a></div>
+                <div class="xright">
+                    <div class="t cart_title_6">西装鸡</div>
+                    <div class="t hong shuziti"><i class="iconfont f14">&#xeb1e;</i><span class="cart_price_6">90</span>/件<span class="caolv"></span></div>
+                    <div class="xxleft">
+                        <p class="sample">成都仓<span class="hide cart_sku_6">（售罄）</span></p>
+                        <input type="text" class="hide" value="0" name="cart_sku_6">
+                    </div>
+                    <div class="xxright">
+                        <span class="caculate jzlanse" onclick="javascript:caculate_number( 1, 6, 0);">+</span>
+                        <input type="text" readonly value="3" name="cart_number_6" class="cart_number_6" onClick="cartinputnumber(6, 0)" autocomplete="off">
+                        <span class="caculate jzlanse" onclick="javascript:caculate_number( 0, 6, 0);">-</span>
+                    </div>
+                </div>
+            </div>
+            <div class="des">
+                
+            </div>
+        </div>
+    </li>
+    
+</ul>
+<!--购物车列表-->
+
+{include file="public/footer" /}

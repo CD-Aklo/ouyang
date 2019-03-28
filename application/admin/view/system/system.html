@@ -1,0 +1,129 @@
+{include file="common/head"/}
+<div class="admin-main layui-anim layui-anim-upbit">
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend>网站设置</legend>
+    </fieldset>
+    <div class="layui-tab">
+        <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show">
+                <form class="layui-form layui-form-pane" lay-filter="form-system">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">网站名称</label>
+                        <div class="layui-input-4">
+                            <input type="text"name="name" lay-verify="required" placeholder="请输入网站名称" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">网站网址</label>
+                        <div class="layui-input-4">
+                            <input type="text" name="url" lay-verify="url" placeholder="请输入网站网址" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">网站LOGO</label>
+                        <input type="hidden" name="logo" id="logo">
+                        <div class="layui-input-block">
+                            <div class="layui-upload">
+                                <button type="button" class="layui-btn layui-btn-primary" id="logoBtn"><i class="icon icon-upload3"></i>点击上传</button>
+                                <div class="layui-upload-list">
+                                    <img class="layui-upload-img" id="speLogo">
+                                    <p id="demoText"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">备案号</label>
+                        <div class="layui-input-3">
+                            <input type="text" name="bah" placeholder="请输入备案号" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">Copyright</label>
+                        <div class="layui-input-3">
+                            <input type="text" name="copyright" placeholder="请输入Copyright" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">公司地址</label>
+                        <div class="layui-input-3">
+                            <input type="text" name="ads" placeholder="请输入公司地址" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">联系电话</label>
+                        <div class="layui-input-3">
+                            <input type="text" name="tel" placeholder="请输入联系电话" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">邮箱</label>
+                        <div class="layui-input-3">
+                            <input type="text" name="email" placeholder="请输入邮箱" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <button type="button" class="layui-btn" lay-submit="" lay-filter="sys">提交</button>
+                            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+{include file="common/foot"/}
+<script>
+    layui.use(['form', 'layer','upload','element'], function () {
+        var form = layui.form,layer = layui.layer,upload = layui.upload,$ = layui.jquery,element = layui.element;
+        var seytem = {$system|raw};
+        form.val("form-system", seytem);
+        $('#speLogo').attr('src',seytem.logo);
+
+        //普通图片上传
+        var uploadInst = upload.render({
+            elem: '#logoBtn'
+            ,url: '{:url("UpFiles/upload")}'
+            ,before: function(obj){
+                obj.preview(function(index, file, result){
+                    $('#speLogo').attr('src', result); //图片链接（base64）
+                });
+            }
+            ,done: function(res){
+                //上传成功
+                if(res.code>0){
+                    $('#logo').val(res.url);
+                }else{
+                    //如果上传失败
+                    return layer.msg('上传失败');
+                }
+            }
+            ,error: function(){
+                //演示失败状态，并实现重传
+                var demoText = $('#demoText');
+                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-mini demo-reload">重试</a>');
+                demoText.find('.demo-reload').on('click', function(){
+                    uploadInst.upload();
+                });
+            }
+        });
+        //提交监听
+        form.on('submit(sys)', function (data) {
+            loading =layer.load(1, {shade: [0.1,'#fff']});
+            $.post("{:url('system/system')}",data.field,function(res){
+                layer.close(loading);
+                if(res.code > 0){
+                    layer.msg(res.msg,{icon: 1, time: 1000},function(){
+                        location.href = res.url;
+                    });
+                }else{
+                    layer.msg(res.msg,{icon: 2, time: 1000});
+                }
+            });
+        })
+    })
+</script>
+</body>
+</html>

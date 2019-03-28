@@ -1,0 +1,82 @@
+{include file="common/head"/}
+<div class="admin-main layui-anim layui-anim-upbit">
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend>管理员列表</legend>
+    </fieldset>
+    <blockquote class="layui-elem-quote">
+        <a href="{:url('adminAdd')}" class="layui-btn layui-btn-sm">添加管理员</a>
+    </blockquote>
+    <table class="layui-table" id="list" lay-filter="list"></table>
+</div>
+
+{include file="common/foot"/}
+<script type="text/html" id="barDemo">
+    <a href="{:url('adminEdit')}?admin_id={{d.admin_id}}" class="layui-btn layui-btn-xs">编辑</a>
+    {{# if(d.admin_id==1){ }}
+    <a href="#" class="layui-btn layui-btn-xs layui-btn-disabled">删除</a>
+    {{# }else{  }}
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    {{# } }}
+</script>
+<script type="text/html" id="open">
+    {{# if(d.admin_id==1){ }}
+        <input type="checkbox" disabled name="is_open" value="{{d.admin_id}}" lay-skin="switch" lay-text="开启|关闭" lay-filter="open" checked>
+    {{# }else{  }}
+        <input type="checkbox" name="is_open" value="{{d.admin_id}}" lay-skin="switch" lay-text="开启|关闭" lay-filter="open" {{ d.is_open == 1 ? 'checked' : '' }}>
+    {{# } }}
+</script>
+
+<script>
+    layui.use(['table','form'], function() {
+        var table = layui.table,form = layui.form,$ = layui.jquery;
+        var tableIn = table.render({
+            elem: '#list',
+            url: '{:url("adminList")}',
+            method:'post',
+			title:'管理员列表',
+            cols: [[
+                {field:'admin_id', title: 'ID', width:60,fixed: true}
+                ,{field:'username', title: '用户名', width:120}
+				,{field:'title', title: '管理组', width:200}
+                ,{field:'email', title: '邮箱', width:200}
+                ,{field:'tel', title: '联系电话', width:150}
+                ,{field:'filiale', title: '所属分公司', width:150}
+                ,{field:'is_open', title: '状态',width:150,toolbar: '#open'}
+                ,{width:160, align:'center', toolbar: '#barDemo'}
+            ]]
+        });
+        form.on('switch(open)', function(obj){
+            loading =layer.load(1, {shade: [0.1,'#fff']});
+            var id = this.value;
+            var is_open = obj.elem.checked===true?1:0;
+            $.post('{:url("adminState")}',{'id':id,'is_open':is_open},function (res) {
+                layer.close(loading);
+                if (res.status==1) {
+                    // tableIn.reload();
+                }else{
+                    layer.msg(res.msg,{time:1000,icon:2});
+                    return false;
+                }
+            })
+        });
+        table.on('tool(list)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'del'){
+                layer.confirm('{:lang("Are you sure you want to delete it")}', function(index){
+                    $.post("{:url('adminDel')}",{admin_id:data.admin_id},function(res){
+                        if(res.code==1){
+                            layer.msg(res.msg,{time:1000,icon:1});
+                            obj.del();
+                        }else{
+                            layer.msg(res.msg,{time:1000,icon:2});
+                        }
+                    });
+                    layer.close(index);
+                });
+            }
+        });
+
+    });
+</script>
+</body>
+</html>
